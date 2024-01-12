@@ -18,20 +18,36 @@ const Page = () => {
 
   const ValidatePassword = (e) => {
     setPassword(e.target.value);
-    // if (Password !== '') {
-    //   showErrors({ ...Errors, Password: '' });
-    // }
-    if (e.target.value.length >= 8) {
+    if (e.target.value !== '' && Errors.Password === 'Please enter password') {
+      showErrors({ ...Errors, Password: '' });
+    }
+    if (
+      e.target.value.length >= 8 &&
+      Errors.Password === 'Password must be 8 characters'
+    ) {
       showErrors({ ...Errors, Password: '' });
     }
   };
 
   const ValidateConfirmPassword = (e) => {
     setConfirmPassword(e.target.value);
-    if (e.target.value.length >= 8) {
+    if (
+      e.target.value !== '' &&
+      Errors.ConfirmPassword === 'Please enter password'
+    ) {
       showErrors({ ...Errors, ConfirmPassword: '' });
     }
-    if (Password === e.target.value) {
+
+    if (
+      e.target.value.length >= 8 &&
+      Errors.ConfirmPassword === 'Password must be 8 characters'
+    ) {
+      showErrors({ ...Errors, ConfirmPassword: '' });
+    }
+    if (
+      Password === e.target.value &&
+      Errors.ConfirmPassword === 'Password must be same'
+    ) {
       showErrors({ ...Errors, ConfirmPassword: '' });
     }
   };

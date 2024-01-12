@@ -2,8 +2,117 @@
 import Link from 'next/link';
 import React from 'react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-const page = () => {
+const Page = () => {
+  const router = useRouter();
+  const [Email, setEmail] = useState('');
+  const [Password, setPassword] = useState('');
+  const [ConfirmPassword, setConfirmPassword] = useState('');
+  const [Error, setError] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const IsVAlidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const ValidateEmail = (e) => {
+    setEmail(e.target.value);
+    if (e.target.value !== '' && Error.email === 'Please enter email') {
+      setError({ ...Error, email: '' });
+    }
+
+    if (IsVAlidEmail(e.target.value)) {
+      setError({ ...Error, email: '' });
+    }
+  };
+  const ValidatePassword = (e) => {
+    setPassword(e.target.value);
+    if (e.target.value !== '' && Error.password === 'Please enter password') {
+      setError({ ...Error, password: '' });
+    }
+    if (
+      e.target.value.length >= 8 &&
+      Error.password === 'Password must be 8 characters'
+    ) {
+      setError({ ...Error, password: '' });
+    }
+  };
+
+  const ValidateConfirmPassword = (e) => {
+    setConfirmPassword(e.target.value);
+    if (
+      e.target.value !== '' &&
+      Error.confirmPassword === 'Please enter password'
+    ) {
+      setError({ ...Error, confirmPassword: '' });
+    }
+    if (
+      e.target.value.length >= 8 &&
+      Error.confirmPassword === 'Password must be 8 characters'
+    ) {
+      setError({ ...Error, confirmPassword: '' });
+    }
+  };
+
+  const FormValidations = () => {
+    // Assuming you have Email, Password, setError, and IsVAlidEmail defined
+
+    let errors = { email: '', password: '', confirmPassword: '' };
+
+    // check if email is empty
+    if (!Email) {
+      errors = { ...errors, email: 'Please enter email' };
+    }
+    // check if email is valid
+    else if (!IsVAlidEmail(Email)) {
+      errors = { ...errors, email: 'Please enter valid email' };
+    }
+
+    // check if password is empty
+    if (!Password) {
+      errors = { ...errors, password: 'Please enter password' };
+    }
+    // check if password is valid
+    else if (Password.length < 8) {
+      errors = { ...errors, password: 'Password must be 8 characters' };
+    } else if (!ConfirmPassword) {
+      errors = { ...errors, confirmPassword: 'Please enter password' };
+    } else if (ConfirmPassword.length < 8) {
+      errors = { ...errors, confirmPassword: 'Password must be 8 characters' };
+    } else if (Password !== ConfirmPassword) {
+      errors = { ...errors, confirmPassword: 'Password must be same' };
+    }
+
+    // Update the error state once all checks are done
+    setError(errors);
+
+    // Check if there are any errors
+    if (
+      errors.email !== '' ||
+      errors.password !== '' ||
+      errors.confirmPassword !== ''
+    ) {
+      // Validation failed
+      return false;
+    }
+
+    // Validation passed, proceed with the form submission or other actions
+    return true;
+  };
+
+  const SubmitHandler = (e) => {
+    e.preventDefault();
+    // run validations
+    if (!FormValidations()) {
+      return;
+    }
+    // construct url with query of the email and navigate to that url
+    const url = '/Login';
+    router.push(url);
+  };
   return (
     <div className="flex flex-col items-center justify-center relative w-screen h-[1024px] gap-10">
       <div class="w-[567.17px] h-[568.06px] absolute origin-top-left rotate-90 -top-32 left-[45rem] opacity-80 -z-10 bg-white">
@@ -25,7 +134,10 @@ const page = () => {
       <div className="h-[39px] font-bold text-[#1c1ba5] text-[32px] tracking-[0] leading-[normal]">
         Register Account
       </div>
-      <form className="bg-white flex flex-col pt-12 px-9 gap-4 pb-7 rounded-xl">
+      <form
+        className="bg-white flex flex-col pt-12 px-9 gap-4 pb-7 rounded-xl"
+        onSubmit={SubmitHandler}
+      >
         <div className="flex flex-col gap-3">
           <label
             for="email"
@@ -34,6 +146,14 @@ const page = () => {
             Email adress*
           </label>
           <input
+            style={{
+              border:
+                Error.email !== ''
+                  ? '0.889px solid #EB4335'
+                  : '0.889px solid #8692A6',
+            }}
+            value={Email}
+            onChange={ValidateEmail}
             id="email"
             type="email"
             className="w-[379px] h-[57px]  rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
@@ -42,6 +162,9 @@ const page = () => {
           "
             placeholder="Enter email address"
           />
+          {Error.email !== '' && (
+            <span className="text-[#EB4335] text-[12px]">{Error.email}</span>
+          )}
         </div>
         <div className="flex flex-col gap-3">
           <label
@@ -51,6 +174,14 @@ const page = () => {
             Create password*
           </label>
           <input
+            style={{
+              border:
+                Error.password !== ''
+                  ? '0.889px solid #EB4335'
+                  : '0.889px solid #8692A6',
+            }}
+            value={Password}
+            onChange={ValidatePassword}
             id="password"
             type="password"
             className="w-[379px] h-[57px] rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
@@ -59,6 +190,9 @@ const page = () => {
           "
             placeholder="Password"
           />
+          {Error.password !== '' && (
+            <span className="text-[#EB4335] text-[12px]">{Error.password}</span>
+          )}
         </div>
         <div className="flex flex-col gap-3">
           <label
@@ -68,14 +202,27 @@ const page = () => {
             Repeat password*
           </label>
           <input
+            style={{
+              border:
+                Error.confirmPassword !== ''
+                  ? '0.889px solid #EB4335'
+                  : '0.889px solid #8692A6',
+            }}
             id="repeat-password"
             type="password"
+            value={ConfirmPassword}
+            onChange={ValidateConfirmPassword}
             className="w-[379px] h-[57px] rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
           placeholder:text-[16px]  pl-6    placeholder:font-light  placeholder:leading-[normal]
 
           "
             placeholder="Repeat Password"
           />
+          {Error.confirmPassword !== '' && (
+            <span className="text-[#EB4335] text-[12px]">
+              {Error.confirmPassword}
+            </span>
+          )}
         </div>
         <div className="flex gap-4">
           <CustomRadioButton />
@@ -99,7 +246,10 @@ const page = () => {
             </span>
           </label>
         </div>
-        <button className="h-[57px] bg-[#191bab] rounded-[5.31px]">
+        <button
+          type="submit"
+          className="h-[57px] bg-[#191bab] rounded-[5.31px]"
+        >
           <span className="font-medium text-white text-[16px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
             Register account
           </span>
@@ -188,4 +338,4 @@ const CustomRadioButton = () => {
     </div>
   );
 };
-export default page;
+export default Page;
