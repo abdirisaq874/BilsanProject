@@ -11,31 +11,74 @@ const Page = () => {
   const [ConfirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const SubmitHandler = (e) => {
-    e.preventDefault();
+  const [Errors, showErrors] = useState({
+    Password: '',
+    ConfirmPassword: '',
+  });
+
+  const ValidatePassword = (e) => {
+    setPassword(e.target.value);
+    // if (Password !== '') {
+    //   showErrors({ ...Errors, Password: '' });
+    // }
+    if (e.target.value.length >= 8) {
+      showErrors({ ...Errors, Password: '' });
+    }
+  };
+
+  const ValidateConfirmPassword = (e) => {
+    setConfirmPassword(e.target.value);
+    if (e.target.value.length >= 8) {
+      showErrors({ ...Errors, ConfirmPassword: '' });
+    }
+    if (Password === e.target.value) {
+      showErrors({ ...Errors, ConfirmPassword: '' });
+    }
+  };
+
+  const FormValidations = () => {
+    const errors = {
+      Password: '',
+      ConfirmPassword: '',
+    };
     // check if password is empty
     if (!Password) {
-      alert('Please enter password');
-      return;
+      errors.Password = 'Please enter password';
+      showErrors(errors);
+      return false;
     }
     // check if password is valid
     if (Password.length < 8) {
-      alert('Password must be 8 characters');
-      return;
+      errors.Password = 'Password must be 8 characters';
+      showErrors(errors);
+      return false;
     }
     // check if password is empty
     if (!ConfirmPassword) {
-      alert('Please enter password');
-      return;
+      errors.ConfirmPassword = 'Please enter password';
+      showErrors(errors);
+      return false;
     }
     // check if password is valid
     if (ConfirmPassword.length < 8) {
-      alert('Password must be 8 characters');
-      return;
+      errors.ConfirmPassword = 'Password must be 8 characters';
+      showErrors(errors);
+      return false;
     }
     // check if password is same
     if (Password !== ConfirmPassword) {
-      alert('Password must be same');
+      errors.ConfirmPassword = 'Password must be same';
+      showErrors(errors);
+      return false;
+    }
+
+    return true;
+  };
+  const SubmitHandler = (e) => {
+    e.preventDefault();
+    // run validations
+    const isValid = FormValidations();
+    if (!isValid) {
       return;
     }
     // construct url with query of the email and navigate to that url
@@ -79,10 +122,16 @@ const Page = () => {
           >
             New password
           </label>
-          <div className="relative">
+          <div className="relative flex flex-col">
             <input
+              style={{
+                border:
+                  Errors.Password !== ''
+                    ? '0.889px solid #EB4335'
+                    : '0.889px solid #8692A6',
+              }}
               value={Password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={ValidatePassword}
               id="password"
               type={`${showPassword ? 'text' : 'password'}`}
               className="w-[379px] h-[57px]  rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
@@ -114,6 +163,11 @@ const Page = () => {
                 fill-opacity="0.6"
               />
             </svg>
+            {Errors.Password !== '' && (
+              <span className="text-[#EB4335] text-[12px]">
+                {Errors.Password}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-3">
@@ -123,10 +177,16 @@ const Page = () => {
           >
             Confirm new password
           </label>
-          <div className="relative">
+          <div className="relative flex flex-col">
             <input
+              style={{
+                border:
+                  Errors.ConfirmPassword !== ''
+                    ? '0.889px solid #EB4335'
+                    : '0.889px solid #8692A6',
+              }}
               value={ConfirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={ValidateConfirmPassword}
               id="Cpassword"
               type={`${showConfirmPassword ? 'text' : 'password'}`}
               className="w-[379px] h-[57px]  rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
@@ -158,6 +218,11 @@ const Page = () => {
                 fill-opacity="0.6"
               />
             </svg>
+            {Errors.ConfirmPassword !== '' && (
+              <span className="text-[#EB4335] text-[12px]">
+                {Errors.ConfirmPassword}
+              </span>
+            )}
           </div>
         </div>
 

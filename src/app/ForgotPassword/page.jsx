@@ -10,16 +10,24 @@ const Page = () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
   const [Email, setEmail] = useState('');
+  const [Error, setError] = useState('');
+
+  const ValidateEmail = (e) => {
+    setEmail(e.target.value);
+    if (IsVAlidEmail(e.target.value)) {
+      setError('');
+    }
+  };
   const SubmitHandler = (e) => {
     e.preventDefault();
     // check if email is empty
     if (!Email) {
-      alert('Please enter email');
+      setError('Please enter email');
       return;
     }
     // check if email is valid
     if (!IsVAlidEmail(Email)) {
-      alert('Please enter valid email');
+      setError('Please enter valid email');
       return;
     }
     // construct url with query of the email and navigate to that url
@@ -67,15 +75,19 @@ const Page = () => {
 
           <input
             value={Email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={ValidateEmail}
             id="email"
             type="email"
-            className="w-[379px] h-[57px]  rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
+            style={{
+              border: Error ? '0.889px solid #EB4335' : '0.889px solid #8692A6',
+            }}
+            className="w-[379px] h-[57px]  rounded-[5.33px]  placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
           placeholder:text-[16px]  pl-6    placeholder:font-light  placeholder:leading-[normal]
 
           "
             placeholder="Enter email address"
           />
+          {Error && <span className="text-[#EB4335] text-[12px]">{Error}</span>}
         </div>
 
         <button className="h-[57px] bg-[#191bab] rounded-[5.31px]">

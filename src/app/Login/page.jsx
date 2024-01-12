@@ -1,9 +1,80 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useState } from 'react';
 
-const page = () => {
+const Page = () => {
+  const router = useRouter();
+  const [Email, setEmail] = useState('');
+  const [Password, setPassword] = useState('');
+  const [Error, setError] = useState({
+    email: '',
+    password: '',
+  });
+  const IsVAlidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const ValidateEmail = (e) => {
+    setEmail(e.target.value);
+    if (IsVAlidEmail(e.target.value)) {
+      setError({ ...Error, email: '' });
+    }
+  };
+  const ValidatePassword = (e) => {
+    setPassword(e.target.value);
+    if (e.target.value.length >= 8) {
+      setError({ ...Error, password: '' });
+    }
+  };
+
+  const FormValidations = () => {
+    // Assuming you have Email, Password, setError, and IsVAlidEmail defined
+
+    let errors = { email: '', password: '' };
+
+    // check if email is empty
+    if (!Email) {
+      errors = { ...errors, email: 'Please enter email' };
+    }
+    // check if email is valid
+    else if (!IsVAlidEmail(Email)) {
+      errors = { ...errors, email: 'Please enter valid email' };
+    }
+
+    // check if password is empty
+    if (!Password) {
+      errors = { ...errors, password: 'Please enter password' };
+    }
+    // check if password is valid
+    else if (Password.length < 8) {
+      errors = { ...errors, password: 'Password must be 8 characters' };
+    }
+
+    // Update the error state once all checks are done
+    setError(errors);
+
+    // Check if there are any errors
+    if (errors.email !== '' || errors.password !== '') {
+      // Validation failed
+      return false;
+    }
+
+    // Validation passed, proceed with the form submission or other actions
+    return true;
+  };
+
+  const SubmitHandler = (e) => {
+    e.preventDefault();
+    // run validations
+    if (!FormValidations()) {
+      return;
+    }
+    // construct url with query of the email and navigate to that url
+    const url = '/Dashboard';
+    router.push(url);
+  };
   return (
     <div className="flex flex-col items-center justify-center relative w-screen h-[1024px] gap-10">
       <div class="w-[567.17px] h-[568.06px] absolute origin-top-left rotate-90 -top-32 left-[45rem] opacity-80 -z-10 bg-white">
@@ -25,7 +96,10 @@ const page = () => {
       <div className="h-[39px] font-bold text-[#1c1ba5] text-[32px] tracking-[0] leading-[normal]">
         Login
       </div>
-      <form className="bg-white flex flex-col pt-12 px-9 gap-4 pb-7 rounded-xl">
+      <form
+        className="bg-white flex flex-col pt-12 px-9 gap-4 pb-7 rounded-xl"
+        onSubmit={SubmitHandler}
+      >
         <div className="flex flex-col gap-3">
           <label
             for="email"
@@ -34,7 +108,15 @@ const page = () => {
             Enter email adress
           </label>
           <input
+            style={{
+              border:
+                Error.email !== ''
+                  ? '0.889px solid #EB4335'
+                  : '0.889px solid #8692A6',
+            }}
             id="email"
+            value={Email}
+            onChange={ValidateEmail}
             type="email"
             className="w-[379px] h-[57px]  rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
           placeholder:text-[16px]  pl-6    placeholder:font-light  placeholder:leading-[normal]
@@ -42,6 +124,11 @@ const page = () => {
           "
             placeholder="Enter email address"
           />
+          {Error.email !== '' && (
+            <span className="text-[#EB4335] text-[14px] tracking-[0] leading-[normal]">
+              {Error.email}
+            </span>
+          )}
         </div>
         <div className="flex flex-col gap-3">
           <label
@@ -51,6 +138,14 @@ const page = () => {
             password
           </label>
           <input
+            style={{
+              border:
+                Error.password !== ''
+                  ? '0.889px solid #EB4335'
+                  : '0.889px solid #8692A6',
+            }}
+            value={Password}
+            onChange={ValidatePassword}
             id="password"
             type="password"
             className="w-[379px] h-[57px] rounded-[5.33px] border-[0.89px] border-solid border-[#8591a5] placeholder:absolute placeholder-[#A5B3CD] placeholder:mt-[18px] placeholder:top-0
@@ -59,6 +154,11 @@ const page = () => {
           "
             placeholder="Password"
           />
+          {Error.password !== '' && (
+            <span className="text-[#EB4335] text-[14px] tracking-[0] leading-[normal]">
+              {Error.password}
+            </span>
+          )}
         </div>
         <div className="flex justify-between">
           <div className="flex gap-4">
@@ -78,7 +178,10 @@ const page = () => {
           </Link>
         </div>
 
-        <button className="h-[57px] bg-[#191bab] rounded-[5.31px]">
+        <button
+          className="h-[57px] bg-[#191bab] rounded-[5.31px]"
+          type="submit"
+        >
           <span className="font-medium text-white text-[16px] text-center tracking-[0] leading-[normal] whitespace-nowrap">
             Login account
           </span>
@@ -195,4 +298,4 @@ const CustomRadioButton = () => {
     </div>
   );
 };
-export default page;
+export default Page;
